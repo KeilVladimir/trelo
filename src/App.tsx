@@ -9,6 +9,7 @@ const ColumnsStyle = styled.div`
   justify-content: space-around;
 `;
 const App: React.FC = () => {
+  //вопрос про нейминг App на Board
   const arrayColumns = [
     {
       nameColumns: 'TODO',
