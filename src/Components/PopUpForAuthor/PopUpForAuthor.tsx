@@ -1,14 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
-const StyledPopUp = styled.div<{ isOpen: boolean }>`
+import LocalStorage from '../../Services/LocalStorage';
+const PopUpForAuthor: React.FC<{
+  setIsOpen: (isOpen: boolean) => void;
+}> = (props) => {
+  let authorName = '';
+  useEffect(() => {
+    console.log('render');
+  }, []);
+  return (
+    <StyledPopUp>
+      <div>
+        <h3>Здравствуйте, введите свое имя</h3>
+        <input
+          onChange={(event) => {
+            authorName = JSON.stringify(event.target.value);
+          }}
+          type="text"
+          placeholder="Введите имя"
+        />
+        <button
+          onClick={() => {
+            LocalStorage.setInLocal(LocalStorage.keyAuthor, authorName);
+            props.setIsOpen(false);
+          }}>
+          Ввести имя
+        </button>
+      </div>
+    </StyledPopUp>
+  );
+};
+const StyledPopUp = styled.div`
   position: fixed;
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.3);
   top: 0;
   left: 0;
-  display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+  display: block;
 
   div {
     position: absolute;
@@ -39,38 +68,4 @@ const StyledPopUp = styled.div<{ isOpen: boolean }>`
     color: black;
   }
 `;
-
-const PopUpForAuthor: React.FC<{
-  SetStateInLocal(key: string, state: string);
-}> = (props) => {
-  let ops;
-  if (localStorage.getItem('AuthorName') === null) {
-    ops = true;
-  }
-  const [open, SetOpen] = useState<boolean>(ops);
-  const AuthorNameKey = 'AuthorName';
-  let AuthorName = '';
-
-  return (
-    <StyledPopUp isOpen={open}>
-      <div>
-        <h3>Здравствуйте, введите свое имя</h3>
-        <input
-          onChange={(event) => {
-            AuthorName = event.target.value;
-          }}
-          type="text"
-          placeholder="Введите имя"
-        />
-        <button
-          onClick={() => {
-            props.SetStateInLocal(AuthorNameKey, AuthorName);
-            SetOpen(!open);
-          }}>
-          Ввести имя
-        </button>
-      </div>
-    </StyledPopUp>
-  );
-};
 export default PopUpForAuthor;
