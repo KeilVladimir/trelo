@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Card } from '../Card';
-import { Local } from '../../services/LocalStorage';
+import { Local } from '../../services/localStorage';
 interface PropsForColumn {
   nameColumns: string;
 
