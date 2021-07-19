@@ -1,2 +1,1 @@
-import PopUpForAuthor from './PopUpForAuthor';
-export default PopUpForAuthor;
+export { default as PopUpForAuthor } from './PopUpForAuthor';

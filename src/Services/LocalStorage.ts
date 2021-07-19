@@ -1,11 +1,17 @@
 class LocalStorage {
-  static keyColumn = 'nameBoard';
-  static keyAuthor = 'AuthorName';
-  static setInLocal(key: string, state: string) {
-    localStorage.setItem(key, state);
+  private keyColumn = 'nameBoard';
+  private keyAuthor = 'AuthorName';
+  getFromLocalAuthor() {
+    return localStorage.getItem(this.keyAuthor);
   }
-  static getFromLocal(key: string) {
-    return localStorage.getItem(key);
+  getFromLocalColumn() {
+    return localStorage.getItem(this.keyColumn);
+  }
+  setInLocalAuthor(state: string) {
+    localStorage.setItem(this.keyAuthor, state);
+  }
+  setInLocalColumn(state: string) {
+    localStorage.setItem(this.keyColumn, state);
   }
 }
-export default LocalStorage;
+export const Local = new LocalStorage();

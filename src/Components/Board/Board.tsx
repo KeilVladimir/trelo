@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Column from '../Column';
-import PopUpForAuthor from '../PopUpForAuthor';
-import LocalStorage from '../../Services/LocalStorage';
+import { Column } from '../Column';
+import { PopUpForAuthor } from '../PopUpForAuthor';
+import { Local } from '../../services/LocalStorage';
+import { v4 as uuid } from 'uuid';
 
-console.log(LocalStorage);
 const Board: React.FC = () => {
   const columns = [
     {
       nameColumns: 'TODO',
-      id: 0,
+      id: uuid(),
     },
     {
       nameColumns: 'In Progress',
-      id: 1,
+      id: uuid(),
     },
     {
       nameColumns: 'Testing',
-      id: 2,
+      id: uuid(),
     },
     {
       nameColumns: 'Done',
-      id: 3,
+      id: uuid(),
     },
   ];
 
@@ -38,18 +38,19 @@ const Board: React.FC = () => {
       localStorage.getItem('nameBoard') || '[]',
     ) as columnTypes[];
     if (storeForColumn.length === 0) {
-      JSON.stringify(columns);
-      LocalStorage.setInLocal(LocalStorage.keyColumn, JSON.stringify(columns));
+      Local.setInLocalColumn(JSON.stringify(columns));
       setCreatedColumn(columns);
     } else {
       setCreatedColumn(storeForColumn);
     }
   }, []);
-  let open;
-  if (LocalStorage.getFromLocal(LocalStorage.keyAuthor) === null) {
-    open = true;
-  }
-  const [isOpen, setIsOpen] = useState<boolean>(open);
+
+  const [isOpen, setIsOpen] = useState<boolean>(
+    Local.getFromLocalAuthor() === null,
+  );
+  useEffect(() => {
+    setIsOpen(Local.getFromLocalAuthor() === null);
+  });
   return (
     <>
       <ColumnsStyle>

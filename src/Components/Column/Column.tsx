@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Card from '../Card';
-import LocalStorage from '../../Services/LocalStorage';
+import { Card } from '../Card';
+import { Local } from '../../services/LocalStorage';
 interface PropsForColumn {
   nameColumns: string;
+
   id: number;
 }
 
@@ -17,29 +18,30 @@ const Column: React.FC<{
   const [nameBoard, setNameBoard] = useState<string>(
     props.propsForColumn.nameColumns,
   );
+  const columns = JSON.parse(Local.getFromLocalColumn() || '[]');
+  const columnActual = columns.findIndex(
+    (item) => item.nameColumns === nameBoard,
+  );
   const handleNameColumn = (event) => {
     setNameBoard(event.target.value);
-    const arrayColumns = JSON.parse(
-      LocalStorage.getFromLocal(LocalStorage.keyColumn) || '[]',
-    );
-
-    arrayColumns[props.propsForColumn.id] = {
+    columns[columnActual] = {
       nameColumns: event.target.value,
       id: props.propsForColumn.id,
     };
-    LocalStorage.setInLocal(
-      LocalStorage.keyColumn,
-      JSON.stringify(arrayColumns),
-    );
+    Local.setInLocalColumn(JSON.stringify(columns));
   };
   return (
     <BoardStyled>
       <textarea onChange={handleNameColumn} value={nameBoard}>
         {nameBoard}
       </textarea>
-      {props.cardName.map((elem) => (
-        <Card key={2} cardName={elem.name} /> //передать массив из карточек из APP в Column и из коламна мэпом выводить карты , ком для себя чтобы не забыть че хотел сделать
-      ))}
+      {props.cardName.map(
+        (
+          elem, // переделал
+        ) => (
+          <Card key={1} cardName={elem.name} /> //передать массив из карточек из APP в Column и из коламна мэпом выводить карты , ком для себя чтобы не забыть че хотел сделать
+        ),
+      )}
       {isOpenAddCard && (
         <AddCard
           isOpen={true}

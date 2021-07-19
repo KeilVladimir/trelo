@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import LocalStorage from '../../Services/LocalStorage';
+import { Local } from '../../services/LocalStorage';
 const PopUpForAuthor: React.FC<{
   setIsOpen: (isOpen: boolean) => void;
 }> = (props) => {
@@ -21,7 +21,7 @@ const PopUpForAuthor: React.FC<{
         />
         <button
           onClick={() => {
-            LocalStorage.setInLocal(LocalStorage.keyAuthor, authorName);
+            Local.setInLocalAuthor(authorName);
             props.setIsOpen(false);
           }}>
           Ввести имя
