@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Local } from '../../services/LocalStorage';
+import { Local } from '../../services/localStorage';
 const PopUpForAuthor: React.FC<{
   setIsOpen: (isOpen: boolean) => void;
 }> = (props) => {
