@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Column } from '../Column';
 import { PopUpForAuthor } from '../PopUpForAuthor';
-import {Local} from '../../services/localStorage';
+import { Local } from '../../services/localStorage';
 import { v4 as uuid } from 'uuid';
 
 const Board: React.FC = () => {
