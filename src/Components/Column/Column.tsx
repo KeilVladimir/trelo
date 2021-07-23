@@ -1,44 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
-import Card from '../Card';
-import LocalStorage from '../../Services/LocalStorage';
-interface PropsForColumn {
-  nameColumns: string;
-  id: number;
-}
+import { Card } from '../Card';
+import { v4 as uuid } from 'uuid';
+import { Local } from '../../services/localStorage';
+import { Card as CardType, ColumnTypes, PropsForColumn } from '../../types';
 
 const Column: React.FC<{
   key: number;
   propsForColumn: PropsForColumn;
-  cardName: any[]; // по карточкам еще не сделал
+  cards: CardType[];
+  setCreatedColumn: (createdColumn: ColumnTypes[]) => void;
 }> = (props) => {
   const [isOpenAddCard, setIsOpenAddCard] = useState<boolean>(true);
   const [isOpenButton, setIsOpenButton] = useState<boolean>(false);
-  const [nameBoard, setNameBoard] = useState<string>(
+  const [nameColumn, setNameBoard] = useState<string>(
     props.propsForColumn.nameColumns,
   );
+  const refCardName = useRef<HTMLInputElement>(null);
+
+  const columns = Local.getColumn();
+  const columnActual = columns.findIndex(
+    (item) => item.nameColumns === nameColumn,
+  );
+
+  const handleCard = () => {
+    columns[columnActual].cards.push({
+      id: uuid(),
+      about: '',
+      name: refCardName.current?.value,
+      author: Local.getAuthor() || '',
+      comments: [],
+    });
+    props.setCreatedColumn(columns);
+    Local.setColumn(columns);
+  };
+
   const handleNameColumn = (event) => {
     setNameBoard(event.target.value);
-    const arrayColumns = JSON.parse(
-      LocalStorage.getFromLocal(LocalStorage.keyColumn) || '[]',
-    );
-
-    arrayColumns[props.propsForColumn.id] = {
+    columns[columnActual] = {
       nameColumns: event.target.value,
       id: props.propsForColumn.id,
+      cards: props.cards,
     };
-    LocalStorage.setInLocal(
-      LocalStorage.keyColumn,
-      JSON.stringify(arrayColumns),
-    );
+    Local.setColumn(columns);
+    props.setCreatedColumn(columns);
   };
   return (
     <BoardStyled>
-      <textarea onChange={handleNameColumn} value={nameBoard}>
-        {nameBoard}
+      <textarea onChange={handleNameColumn} value={nameColumn}>
+        {nameColumn}
       </textarea>
-      {props.cardName.map((elem) => (
-        <Card key={2} cardName={elem.name} /> //передать массив из карточек из APP в Column и из коламна мэпом выводить карты , ком для себя чтобы не забыть че хотел сделать
+      {props.cards.map((elem) => (
+        <Card key={elem.id} {...elem} nameColumn={nameColumn} />
       ))}
       {isOpenAddCard && (
         <AddCard
@@ -52,11 +65,12 @@ const Column: React.FC<{
       )}
       {isOpenButton && (
         <CardForm>
-          <input placeholder="Введите название карточки" />
+          <input ref={refCardName} placeholder="Введите название карточки" />
           <button
             onClick={() => {
               setIsOpenButton(false);
               setIsOpenAddCard(true);
+              handleCard();
             }}>
             Добавить карточку
           </button>
@@ -107,6 +121,7 @@ const BoardStyled = styled.div<string>`
     font-size: 19px;
     padding-bottom: 10px;
     border: none;
+    resize: none;
   }
 
   width: 270px;
@@ -115,5 +130,4 @@ const BoardStyled = styled.div<string>`
   background: rgb(235, 236, 240);
   font-family: sans-serif;
 `;
-
 export default Column;

@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import LocalStorage from '../../Services/LocalStorage';
+import { Local } from '../../services/localStorage';
+
 const PopUpForAuthor: React.FC<{
   setIsOpen: (isOpen: boolean) => void;
 }> = (props) => {
   let authorName = '';
-  useEffect(() => {
-    console.log('render');
-  }, []);
   return (
     <StyledPopUp>
       <div>
         <h3>Здравствуйте, введите свое имя</h3>
         <input
           onChange={(event) => {
-            authorName = JSON.stringify(event.target.value);
+            authorName = event.target.value;
           }}
           type="text"
           placeholder="Введите имя"
         />
         <button
           onClick={() => {
-            LocalStorage.setInLocal(LocalStorage.keyAuthor, authorName);
+            Local.setAuthor(authorName);
             props.setIsOpen(false);
           }}>
           Ввести имя

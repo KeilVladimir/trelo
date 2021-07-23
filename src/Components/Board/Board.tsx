@@ -1,64 +1,96 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Column from '../Column';
-import PopUpForAuthor from '../PopUpForAuthor';
-import LocalStorage from '../../Services/LocalStorage';
+import { Column } from '../Column';
+import { PopUpForAuthor } from '../PopUpForAuthor';
+import { PopUpForCard } from '../PopUpForCard';
+import { Local } from '../../services/localStorage';
+import { ColumnTypes, InfoCard } from '../../types';
+import { v4 as uuid } from 'uuid';
 
-console.log(LocalStorage);
+export const Context = React.createContext<(state: ColumnTypes[]) => void>(
+  () => {},
+);
+export const ContextCard = React.createContext<(state: InfoCard) => void>(
+  () => {},
+);
+export const ContextOpenInfo = React.createContext<(state: boolean) => void>(
+  () => {},
+);
 const Board: React.FC = () => {
-  const columns = [
+  const columns: ColumnTypes[] = [
     {
       nameColumns: 'TODO',
-      id: 0,
+      id: uuid(),
+      cards: [],
     },
     {
       nameColumns: 'In Progress',
-      id: 1,
+      id: uuid(),
+      cards: [],
     },
     {
       nameColumns: 'Testing',
-      id: 2,
+      id: uuid(),
+      cards: [],
     },
     {
       nameColumns: 'Done',
-      id: 3,
+      id: uuid(),
+      cards: [],
     },
   ];
 
-  interface columnTypes {
-    nameColumns: string;
-    id: number;
-    // Cards: { cardsName: string; about: string }[]; // про карты еще не сделал
-  }
-
-  const [createdColumn, setCreatedColumn] = useState<columnTypes[]>([]);
+  const [createdColumn, setCreatedColumn] = useState<ColumnTypes[]>([]);
+  const [isOpenInfo, setIsOpenInfo] = useState<boolean>(false);
+  const [propsInfo, setPropsInfo] = useState<InfoCard | Record<string, never>>(
+    {},
+  );
 
   useEffect(() => {
-    const storeForColumn = JSON.parse(
-      localStorage.getItem('nameBoard') || '[]',
-    ) as columnTypes[];
-    if (storeForColumn.length === 0) {
-      JSON.stringify(columns);
-      LocalStorage.setInLocal(LocalStorage.keyColumn, JSON.stringify(columns));
+    const stateColumn = Local.getColumn();
+    if (stateColumn.length === 0) {
+      Local.setColumn(columns);
       setCreatedColumn(columns);
     } else {
-      setCreatedColumn(storeForColumn);
+      setCreatedColumn(stateColumn);
     }
   }, []);
-  let open;
-  if (LocalStorage.getFromLocal(LocalStorage.keyAuthor) === null) {
-    open = true;
-  }
-  const [isOpen, setIsOpen] = useState<boolean>(open);
+
+  const [isOpen, setIsOpen] = useState<boolean>(Local.getAuthor() === null);
+  useEffect(() => {
+    setIsOpen(Local.getAuthor() === null);
+  }, []);
   return (
-    <>
-      <ColumnsStyle>
-        {createdColumn.map((elem) => (
-          <Column key={elem.id} propsForColumn={elem} cardName={[]} />
-        ))}
-      </ColumnsStyle>
-      {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
-    </>
+    <Context.Provider value={setCreatedColumn}>
+      <ContextCard.Provider value={setPropsInfo}>
+        <ContextOpenInfo.Provider value={setIsOpenInfo}>
+          <>
+            <ColumnsStyle>
+              {createdColumn.map((elem) => (
+                <Column
+                  key={elem.id}
+                  propsForColumn={elem}
+                  cards={elem.cards}
+                  setCreatedColumn={setCreatedColumn}
+                />
+              ))}
+            </ColumnsStyle>
+            {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
+            {isOpenInfo && (
+              <PopUpForCard
+                id={propsInfo.id}
+                author={propsInfo.author}
+                index={propsInfo.index}
+                nameColumn={propsInfo.nameColumn}
+                open={setIsOpenInfo}
+                isOpen={isOpenInfo}
+                state={createdColumn}
+              />
+            )}
+          </>
+        </ContextOpenInfo.Provider>
+      </ContextCard.Provider>
+    </Context.Provider>
   );
 };
 
