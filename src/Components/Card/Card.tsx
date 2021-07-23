@@ -69,6 +69,5 @@ const CardStyle = styled.div`
     border: none;
     font-size: 18px;
   }
-  
 `;
 export default Card;
