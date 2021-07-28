@@ -1,37 +1,37 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import {CardAll} from '../../types';
-import {Local} from '../../services/localStorage';
-import {ContextCard} from '../Board/Board';
-import {ContextOpenInfo} from '../Board/Board';
+import { CardAll } from '../../types';
+import { Local } from '../../services/localStorage';
+import { ContextCard } from '../Board/Board';
+import { ContextOpenInfo } from '../Board/Board';
 
-const Card: React.FC<CardAll> = ({id, name, author, deleteCard}) => {
-    const dispatchInfo = useContext<(id: number) => void>(ContextCard);
-    const open = useContext<(state: boolean) => void>(ContextOpenInfo);
-    let comments = Local.getComment();
-    let commentsActual: number = 0;
-    comments.forEach((comment) => comment.cardId === id && commentsActual++);
-    return (
-        <>
-            <CardStyle>
-                <button
-                    onClick={() => {
-                        deleteCard(id);
-                    }}>
-                    Х
-                </button>
-                <div
-                    onClick={() => {
-                        open(true);
-                        dispatchInfo(id);
-                    }}>
-                    <p>{name}</p>
-                    <p> {'Автор карты: ' + author}</p>
-                    {<p>{' Коментариев: ' + commentsActual}</p>}
-                </div>
-            </CardStyle>
-        </>
-    );
+const Card: React.FC<CardAll> = ({ id, name, author, deleteCard }) => {
+  const dispatchInfo = useContext<(id: number) => void>(ContextCard);
+  const open = useContext<(state: boolean) => void>(ContextOpenInfo);
+  let comments = Local.getComment();
+  let commentsActual: number = 0;
+  comments.forEach((comment) => comment.cardId === id && commentsActual++);
+  return (
+    <>
+      <CardStyle>
+        <button
+          onClick={() => {
+            deleteCard(id);
+          }}>
+          Х
+        </button>
+        <div
+          onClick={() => {
+            open(true);
+            dispatchInfo(id);
+          }}>
+          <p>{name}</p>
+          <p> {'Автор карты: ' + author}</p>
+          {<p>{' Коментариев: ' + commentsActual}</p>}
+        </div>
+      </CardStyle>
+    </>
+  );
 };
 const CardStyle = styled.div`
   width: 150px;
