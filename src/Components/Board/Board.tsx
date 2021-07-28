@@ -4,90 +4,138 @@ import { Column } from '../Column';
 import { PopUpForAuthor } from '../PopUpForAuthor';
 import { PopUpForCard } from '../PopUpForCard';
 import { Local } from '../../services/localStorage';
-import { ColumnTypes, InfoCard } from '../../types';
+import { Card as CardType, ColumnTypes, Comment } from '../../types';
 import { v4 as uuid } from 'uuid';
 
 export const Context = React.createContext<(state: ColumnTypes[]) => void>(
   () => {},
 );
-export const ContextCard = React.createContext<(state: InfoCard) => void>(
-  () => {},
-);
+export const ContextCard = React.createContext<(id: number) => void>(() => {});
 export const ContextOpenInfo = React.createContext<(state: boolean) => void>(
   () => {},
 );
+export const ContextComment = React.createContext<(state: Comment[]) => void>(
+  () => {},
+);
+
 const Board: React.FC = () => {
   const columns: ColumnTypes[] = [
     {
       nameColumns: 'TODO',
       id: uuid(),
-      cards: [],
     },
     {
       nameColumns: 'In Progress',
       id: uuid(),
-      cards: [],
     },
     {
       nameColumns: 'Testing',
       id: uuid(),
-      cards: [],
     },
     {
       nameColumns: 'Done',
       id: uuid(),
-      cards: [],
     },
   ];
-
+  const [cards, setCards] = useState<CardType[]>(Local.getCard());
   const [createdColumn, setCreatedColumn] = useState<ColumnTypes[]>([]);
   const [isOpenInfo, setIsOpenInfo] = useState<boolean>(false);
-  const [propsInfo, setPropsInfo] = useState<InfoCard | Record<string, never>>(
-    {},
-  );
+  const [comments, setComments] = useState<Comment[]>(Local.getComment());
+  const [card, setCard] = useState<CardType>();
 
   useEffect(() => {
     const stateColumn = Local.getColumn();
     if (stateColumn.length === 0) {
       Local.setColumn(columns);
+      Local.setCard([]);
+      Local.setComment([]);
       setCreatedColumn(columns);
     } else {
       setCreatedColumn(stateColumn);
     }
   }, []);
+  const handleCard = (id) => {
+    console.log(id);
+    setCard(cards.find((card) => card.id === id));
+  };
+  let newCard;
+  const handleNameCard = (newName: string, id: number) => {
+    newCard = cards.map((card) => {
+      card.id === id ? (card.name = newName) : card;
+      return card;
+    });
+    setCards(newCard);
+    Local.setCard(newCard);
+  };
 
-  const [isOpen, setIsOpen] = useState<boolean>(Local.getAuthor() === null);
+  const handleDescriptionCard = (newDescription: string, id: number) => {
+    newCard = cards.map((card) => {
+      card.id === id ? (card.about = newDescription) : card;
+      return card;
+    });
+    setCards(newCard);
+    Local.setCard(newCard);
+  };
+  const handleDeleteDescription = (id: number) => {
+    newCard = cards.map((card) => {
+      card.id === id ? (card.about = 'Описание отсутствует') : card;
+      return card;
+    });
+    setCards(newCard);
+    Local.setCard(newCard);
+  };
+  let newComments;
+  const handleComment = (body: string, cardId: number) => {
+    newComments = {
+      body: body,
+      author: Local.getAuthor(),
+      cardId: cardId,
+      id: uuid(),
+    };
+    setComments((prevState) => [...prevState, newComments]);
+    Local.setComment([...comments, newComments]);
+  };
+
+  const [isOpen, setIsOpen] = useState<boolean>(Local.getAuthor() === '');
   useEffect(() => {
-    setIsOpen(Local.getAuthor() === null);
+    setIsOpen(Local.getAuthor() === '');
   }, []);
   return (
     <Context.Provider value={setCreatedColumn}>
-      <ContextCard.Provider value={setPropsInfo}>
+      <ContextCard.Provider value={handleCard}>
         <ContextOpenInfo.Provider value={setIsOpenInfo}>
-          <>
-            <ColumnsStyle>
-              {createdColumn.map((elem) => (
-                <Column
-                  key={elem.id}
-                  propsForColumn={elem}
-                  cards={elem.cards}
-                  setCreatedColumn={setCreatedColumn}
+          <ContextComment.Provider value={setComments}>
+            <>
+              <ColumnsStyle>
+                {createdColumn.map((elem) => (
+                  <Column
+                    key={elem.id}
+                    propsForColumn={elem}
+                    setCreatedColumn={setCreatedColumn}
+                    setCards={setCards}
+                    cards={cards}
+                  />
+                ))}
+              </ColumnsStyle>
+              {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
+              {isOpenInfo && (
+                <PopUpForCard
+                  comments={comments}
+                  id={card!.id}
+                  name={card!.name}
+                  author={card!.author}
+                  about={card!.about}
+                  nameColumns={card!.nameColumns}
+                  open={setIsOpenInfo}
+                  isOpen={isOpenInfo}
+                  renameCard={handleNameCard}
+                  addDescription={handleDescriptionCard}
+                  deleteDescription={handleDeleteDescription}
+                  addComment={handleComment}
                 />
-              ))}
-            </ColumnsStyle>
-            {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
-            {isOpenInfo && (
-              <PopUpForCard
-                id={propsInfo.id}
-                author={propsInfo.author}
-                index={propsInfo.index}
-                nameColumn={propsInfo.nameColumn}
-                open={setIsOpenInfo}
-                isOpen={isOpenInfo}
-                state={createdColumn}
-              />
-            )}
-          </>
+              )}
+            </>
+          </ContextComment.Provider>
         </ContextOpenInfo.Provider>
       </ContextCard.Provider>
     </Context.Provider>

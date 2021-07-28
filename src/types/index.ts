@@ -1,21 +1,29 @@
+
 export interface ColumnTypes {
   nameColumns: string;
   id: number;
-  cards: Card[];
 }
-export interface PropsForColumn {
+interface PropsForColumn {
   nameColumns: string;
   id: number;
+}
+export interface Column {
+  setCreatedColumn: (state: ColumnTypes[]) => void;
+  setCards: (state: Card[]) => void;
+  cards: Card[];
+  propsForColumn: PropsForColumn;
 }
 export interface Card {
   name: string;
   about: string;
   id: number;
+  idColumn: number;
   author: string;
-  comments: Comment[];
-  nameColumn: string;
+  nameColumns: string;
 }
-
+export interface CardAll extends Card {
+  deleteCard: (id: number) => void;
+}
 export interface Comment {
   author: string;
   body: string;
@@ -26,11 +34,16 @@ export interface Comment {
 export interface InfoCard {
   id: number;
   author: string;
-  nameColumn: string;
-  index: number;
+  about: string;
+  name: string;
 }
 export interface InfoCardAll extends InfoCard {
   open: (state: boolean) => void;
+  comments: Comment[];
   isOpen: boolean;
-  state: ColumnTypes[];
+  nameColumns: string;
+  renameCard: (newName: string, id: number) => void;
+  addDescription: (newDescription: string, id: number) => void;
+  deleteDescription: (id: number) => void;
+  addComment: (body: string, cardId: number) => void;
 }

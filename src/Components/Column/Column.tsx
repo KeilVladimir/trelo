@@ -1,81 +1,109 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Card } from '../Card';
 import { v4 as uuid } from 'uuid';
 import { Local } from '../../services/localStorage';
-import { Card as CardType, ColumnTypes, PropsForColumn } from '../../types';
+import { Column as ColumnType } from '../../types';
+import { Error } from '../../ui/Error';
 
-const Column: React.FC<{
-  key: number;
-  propsForColumn: PropsForColumn;
-  cards: CardType[];
-  setCreatedColumn: (createdColumn: ColumnTypes[]) => void;
-}> = (props) => {
+const Column: React.FC<ColumnType> = ({
+  propsForColumn,
+  cards,
+  setCards,
+  setCreatedColumn,
+}) => {
   const [isOpenAddCard, setIsOpenAddCard] = useState<boolean>(true);
   const [isOpenButton, setIsOpenButton] = useState<boolean>(false);
-  const [nameColumn, setNameBoard] = useState<string>(
-    props.propsForColumn.nameColumns,
-  );
-  const refCardName = useRef<HTMLInputElement>(null);
+  const [nameCard, setNameCard] = useState<string>('');
 
-  const columns = Local.getColumn();
-  const columnActual = columns.findIndex(
-    (item) => item.nameColumns === nameColumn,
-  );
-
+  const [isOpenError, setIsOpenError] = useState<boolean>(false);
+  const [isOpenErrorCard, setIsOpenErrorCard] = useState<boolean>(false);
+  let columns = Local.getColumn();
+  const idColumn = propsForColumn.id;
   const handleCard = () => {
-    columns[columnActual].cards.push({
+    cards.push({
       id: uuid(),
-      about: '',
-      name: refCardName.current?.value,
-      author: Local.getAuthor() || '',
-      comments: [],
+      about: 'Описание отсутствует',
+      name: nameCard,
+      author: Local.getAuthor(),
+      idColumn: idColumn,
+      nameColumns: propsForColumn.nameColumns,
     });
-    props.setCreatedColumn(columns);
-    Local.setColumn(columns);
+    Local.setCard(cards);
+    setCards(cards);
   };
-
+  const handleDeleteCard = (id: number) => {
+    let newCards;
+    newCards = cards.filter((card) => card.id !== id);
+    Local.setCard(newCards);
+    setCards(newCards);
+  };
   const handleNameColumn = (event) => {
-    setNameBoard(event.target.value);
-    columns[columnActual] = {
-      nameColumns: event.target.value,
-      id: props.propsForColumn.id,
-      cards: props.cards,
-    };
-    Local.setColumn(columns);
-    props.setCreatedColumn(columns);
+    columns.map((column) => {
+      if (column.id === idColumn) {
+        column.nameColumns = event.target.value;
+        if (event.target.value.trim() === '') {
+          setIsOpenError(true);
+        } else {
+          setIsOpenError(false);
+          Local.setColumn(columns);
+          setCreatedColumn(columns);
+        }
+      }
+    });
   };
   return (
     <BoardStyled>
-      <textarea onChange={handleNameColumn} value={nameColumn}>
-        {nameColumn}
+      <textarea onChange={handleNameColumn} value={propsForColumn.nameColumns}>
+        {propsForColumn.nameColumns}
       </textarea>
-      {props.cards.map((elem) => (
-        <Card key={elem.id} {...elem} nameColumn={nameColumn} />
-      ))}
+      {isOpenError && <Error>Поле не может быть пустым</Error>}
+      {cards.map(
+        (elem) =>
+          idColumn === elem.idColumn && (
+            <Card
+              key={elem.id}
+              {...elem}
+              nameColumns={propsForColumn.nameColumns}
+              deleteCard={handleDeleteCard}
+            />
+          ),
+      )}
       {isOpenAddCard && (
         <AddCard
           isOpen={true}
           onClick={() => {
             setIsOpenAddCard(false);
             setIsOpenButton(true);
+            setIsOpenErrorCard(false);
           }}>
           Добавить карточку
         </AddCard>
       )}
       {isOpenButton && (
         <CardForm>
-          <input ref={refCardName} placeholder="Введите название карточки" />
+          <input
+            onChange={(event) => {
+              setNameCard(event.target.value);
+            }}
+            placeholder="Введите название карточки"
+          />
           <button
             onClick={() => {
-              setIsOpenButton(false);
-              setIsOpenAddCard(true);
-              handleCard();
+              if (nameCard.trim() === '') {
+                setIsOpenErrorCard(true);
+              } else {
+                setIsOpenErrorCard(false);
+                setIsOpenButton(false);
+                setIsOpenAddCard(true);
+                handleCard();
+              }
             }}>
             Добавить карточку
           </button>
         </CardForm>
       )}
+      {isOpenErrorCard && <Error>Поле не может быть пустым</Error>}
     </BoardStyled>
   );
 };

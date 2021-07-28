@@ -1,54 +1,37 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import styled from 'styled-components';
-import { Card as CardProps, InfoCard } from '../../types';
-import { ColumnTypes } from '../../types';
-import { Local } from '../../services/localStorage';
-import { Context } from '../Board/Board';
-import { ContextCard } from '../Board/Board';
-import { ContextOpenInfo } from '../Board/Board';
+import {CardAll} from '../../types';
+import {Local} from '../../services/localStorage';
+import {ContextCard} from '../Board/Board';
+import {ContextOpenInfo} from '../Board/Board';
 
-const Card: React.FC<CardProps> = ({
-  id,
-  name,
-  comments,
-  author,
-  nameColumn,
-}) => {
-  const dispatchInfo = useContext<(state: InfoCard) => void>(ContextCard);
-  const open = useContext<(state: boolean) => void>(ContextOpenInfo);
-  const setCreatedColumn = useContext<(state: ColumnTypes[]) => void>(Context);
-  const columns = Local.getColumn();
-  const columnIndex = columns.findIndex(
-    (Column) => Column.nameColumns === nameColumn,
-  );
-  const deleteCardHandle = () => {
-    columns[columnIndex].cards = columns[columnIndex].cards.filter(
-      (card) => card.id !== id,
+const Card: React.FC<CardAll> = ({id, name, author, deleteCard}) => {
+    const dispatchInfo = useContext<(id: number) => void>(ContextCard);
+    const open = useContext<(state: boolean) => void>(ContextOpenInfo);
+    let comments = Local.getComment();
+    let commentsActual: number = 0;
+    comments.forEach((comment) => comment.cardId === id && commentsActual++);
+    return (
+        <>
+            <CardStyle>
+                <button
+                    onClick={() => {
+                        deleteCard(id);
+                    }}>
+                    Х
+                </button>
+                <div
+                    onClick={() => {
+                        open(true);
+                        dispatchInfo(id);
+                    }}>
+                    <p>{name}</p>
+                    <p> {'Автор карты: ' + author}</p>
+                    {<p>{' Коментариев: ' + commentsActual}</p>}
+                </div>
+            </CardStyle>
+        </>
     );
-    Local.setColumn(columns);
-    setCreatedColumn(columns);
-  };
-  return (
-    <>
-      <CardStyle>
-        <button onClick={deleteCardHandle}>Х</button>
-        <div
-          onClick={() => {
-            open(true);
-            dispatchInfo({
-              id: id,
-              author: author,
-              index: columnIndex,
-              nameColumn: nameColumn,
-            });
-          }}>
-          <p>{name}</p>
-          <p> {'Автор карты: ' + author}</p>
-          <p>{' Коментариев: ' + comments.length}</p>
-        </div>
-      </CardStyle>
-    </>
-  );
 };
 const CardStyle = styled.div`
   width: 150px;
@@ -57,6 +40,7 @@ const CardStyle = styled.div`
   margin-left: 35px;
   height: auto;
   border-radius: 13px;
+
   p {
     padding-top: 5px;
     padding-left: 5px;
