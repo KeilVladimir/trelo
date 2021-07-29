@@ -7,7 +7,7 @@ import { ContextComment } from '../Board/Board';
 import { Error } from '../../ui/Error';
 
 const Comment: Reacts.FC<CommentType> = ({ body, author, id }) => {
-  let comments = Local.getComment();
+  const comments = Local.getComment();
   const setComments = useContext(ContextComment);
   const [newBody, setNewBody] = useState<string>(body);
   const [isOpenComment, setIsOpenComment] = useState<boolean>(false);

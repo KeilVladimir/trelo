@@ -18,7 +18,7 @@ const Column: React.FC<ColumnType> = ({
 
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
   const [isOpenErrorCard, setIsOpenErrorCard] = useState<boolean>(false);
-  let columns = Local.getColumn();
+  const columns = Local.getColumn();
   const idColumn = propsForColumn.id;
   const handleCard = () => {
     cards.push({
@@ -33,8 +33,7 @@ const Column: React.FC<ColumnType> = ({
     setCards(cards);
   };
   const handleDeleteCard = (id: number) => {
-    let newCards;
-    newCards = cards.filter((card) => card.id !== id);
+    const newCards = cards.filter((card) => card.id !== id);
     Local.setCard(newCards);
     setCards(newCards);
   };
