@@ -85,7 +85,7 @@ const Board: React.FC = () => {
   };
 
   const handleComment = (body: string, cardId: number) => {
-    let newComments: Comment = {
+    const newComments: Comment = {
       body: body,
       author: Local.getAuthor(),
       cardId: cardId,
