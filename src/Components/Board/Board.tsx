@@ -120,11 +120,11 @@ const Board: React.FC = () => {
               {isOpenInfo && (
                 <PopUpForCard
                   comments={comments}
-                  id={card!.id}
-                  name={card!.name}
-                  author={card!.author}
-                  about={card!.about}
-                  nameColumns={card!.nameColumns}
+                  id={card?.id ?? 0}
+                  name={card?.name ?? ''}
+                  author={card?.author ?? ''}
+                  about={card?.about ?? ''}
+                  nameColumns={card?.nameColumns ?? ''}
                   open={setIsOpenInfo}
                   isOpen={isOpenInfo}
                   renameCard={handleNameCard}
