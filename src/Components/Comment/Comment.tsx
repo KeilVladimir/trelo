@@ -7,13 +7,14 @@ import { ContextComment } from '../Board/Board';
 import { Error } from '../../ui/Error';
 
 const Comment: Reacts.FC<CommentType> = ({ body, author, id }) => {
-  const comments = Local.getComment();
-  const setComments = useContext(ContextComment);
+  const comments: CommentType[] = Local.getComment();
+  const setComments =
+    useContext<(state: CommentType[]) => void>(ContextComment);
   const [newBody, setNewBody] = useState<string>(body);
   const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
 
-  let newComments;
+  let newComments: CommentType[];
   const handleDeleteComment = (id: number) => {
     newComments = comments.filter((comment) => comment.id !== id);
     setComments(newComments);

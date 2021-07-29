@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Card } from '../Card';
 import { v4 as uuid } from 'uuid';
 import { Local } from '../../services/localStorage';
-import { Column as ColumnType } from '../../types';
+import { Column as ColumnType, ColumnTypes } from '../../types';
 import { Error } from '../../ui/Error';
 
 const Column: React.FC<ColumnType> = ({
@@ -18,7 +18,7 @@ const Column: React.FC<ColumnType> = ({
 
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
   const [isOpenErrorCard, setIsOpenErrorCard] = useState<boolean>(false);
-  const columns = Local.getColumn();
+  const columns: ColumnTypes[] = Local.getColumn();
   const idColumn = propsForColumn.id;
   const handleCard = () => {
     cards.push({
@@ -37,7 +37,7 @@ const Column: React.FC<ColumnType> = ({
     Local.setCard(newCards);
     setCards(newCards);
   };
-  const handleNameColumn = (event) => {
+  const handleNameColumn = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     columns.map((column) => {
       if (column.id === idColumn) {
         column.nameColumns = event.target.value;

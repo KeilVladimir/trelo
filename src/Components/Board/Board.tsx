@@ -44,7 +44,7 @@ const Board: React.FC = () => {
   const [card, setCard] = useState<CardType>();
 
   useEffect(() => {
-    const stateColumn = Local.getColumn();
+    const stateColumn: ColumnTypes[] = Local.getColumn();
     if (stateColumn.length === 0) {
       Local.setColumn(columns);
       Local.setCard([]);
@@ -55,10 +55,9 @@ const Board: React.FC = () => {
     }
   }, []);
   const handleCard = (id) => {
-    console.log(id);
     setCard(cards.find((card) => card.id === id));
   };
-  let newCard;
+  let newCard: CardType[];
   const handleNameCard = (newName: string, id: number) => {
     newCard = cards.map((card) => {
       card.id === id ? (card.name = newName) : card;
@@ -84,9 +83,9 @@ const Board: React.FC = () => {
     setCards(newCard);
     Local.setCard(newCard);
   };
-  let newComments;
+
   const handleComment = (body: string, cardId: number) => {
-    newComments = {
+    let newComments: Comment = {
       body: body,
       author: Local.getAuthor(),
       cardId: cardId,

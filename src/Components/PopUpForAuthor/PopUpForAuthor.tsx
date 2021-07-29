@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Local } from '../../services/localStorage';
 import { Error } from '../../ui/Error';
+
 const PopUpForAuthor: React.FC<{
   setIsOpen: (isOpen: boolean) => void;
 }> = (props) => {
