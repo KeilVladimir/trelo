@@ -54,7 +54,7 @@ const Board: React.FC = () => {
       setCreatedColumn(stateColumn);
     }
   }, []);
-  const handleCard = (id) => {
+  const handleCard = (id: number) => {
     setCard(cards.find((card) => card.id === id));
   };
   let newCard: CardType[];
