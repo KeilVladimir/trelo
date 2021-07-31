@@ -1,29 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Local } from '../../services/localStorage';
+import { Error } from '../../ui/Error';
 
 const PopUpForAuthor: React.FC<{
   setIsOpen: (isOpen: boolean) => void;
 }> = (props) => {
-  let authorName = '';
+  const [name, setName] = useState<string>('');
+  const [isOpenError, setIsOpenError] = useState<boolean>(false);
   return (
     <StyledPopUp>
       <div>
         <h3>Здравствуйте, введите свое имя</h3>
         <input
           onChange={(event) => {
-            authorName = event.target.value;
+            setName(event.target.value);
           }}
           type="text"
           placeholder="Введите имя"
         />
         <button
           onClick={() => {
-            Local.setAuthor(authorName);
-            props.setIsOpen(false);
+            if (name.trim() === '') {
+              setIsOpenError(true);
+            } else {
+              setIsOpenError(false);
+              Local.setAuthor(name);
+              props.setIsOpen(false);
+            }
           }}>
           Ввести имя
         </button>
+        {isOpenError && <Error>Поле не должно быть пустым</Error>}
       </div>
     </StyledPopUp>
   );

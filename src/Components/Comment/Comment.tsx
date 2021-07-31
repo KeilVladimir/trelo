@@ -1,42 +1,41 @@
-import Reacts, { useContext, useState, useRef } from 'react';
+import Reacts, { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { ColumnTypes, Comment as CommentType } from '../../types';
+import { Comment as CommentType } from '../../types';
 import React from 'react';
 import { Local } from '../../services/localStorage';
-import { Context } from '../Board/Board';
-const Comment: Reacts.FC<CommentType> = ({
-  body,
-  author,
-  id,
-  index,
-  cardId,
-}) => {
-  const refComment = useRef<HTMLInputElement>(null);
-  const columns = Local.getColumn();
-  const setCreatedColumn = useContext<(state: ColumnTypes[]) => void>(Context);
+import { ContextComment } from '../Board/Board';
+import { Error } from '../../ui/Error';
+
+const Comment: Reacts.FC<CommentType> = ({ body, author, id }) => {
+  const comments: CommentType[] = Local.getComment();
+  const setComments =
+    useContext<(state: CommentType[]) => void>(ContextComment);
+  const [newBody, setNewBody] = useState<string>(body);
   const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
-  const cardActual = columns[index].cards.findIndex(
-    (card) => card.id === cardId,
-  );
-  const handleCommentUpdate = () => {
-    columns[index].cards[cardActual].comments.map((comment) => {
-      comment.id === id ? (comment.body = refComment.current?.value) : comment;
+  const [isOpenError, setIsOpenError] = useState<boolean>(false);
+
+  let newComments: CommentType[];
+  const handleDeleteComment = (id: number) => {
+    newComments = comments.filter((comment) => comment.id !== id);
+    setComments(newComments);
+    Local.setComment(newComments);
+  };
+  const handleUdpateComment = (id: number) => {
+    newComments = comments.map((comment) => {
+      comment.id === id ? (comment.body = newBody) : comment;
+      return comment;
     });
-
-    setCreatedColumn(columns);
-    Local.setColumn(columns);
+    setComments(newComments);
+    Local.setComment(newComments);
   };
-  const deleteCommentHandle = () => {
-    columns[index].cards[cardActual].comments = columns[index].cards[
-      cardActual
-    ].comments.filter((comment) => comment.id !== id);
-    setCreatedColumn(columns);
-    Local.setColumn(columns);
-  };
-
   return (
     <CommentStyle>
-      <ButtonDelete onClick={deleteCommentHandle}>Х</ButtonDelete>
+      <ButtonDelete
+        onClick={() => {
+          handleDeleteComment(id);
+        }}>
+        Х
+      </ButtonDelete>
       <p>Автор комментария : {author}</p>
       {!isOpenComment && (
         <>
@@ -44,19 +43,32 @@ const Comment: Reacts.FC<CommentType> = ({
           <button
             onClick={() => {
               setIsOpenComment(true);
+              setIsOpenError(false);
             }}>
             {' '}
             Изменить комментарий
           </button>
+          <br />
         </>
       )}
+      {isOpenError && <Error>Введите не пустое значение</Error>}
       {isOpenComment && (
         <>
-          <input ref={refComment} />
+          <input
+            onChange={(event) => {
+              setNewBody(event.target?.value);
+            }}
+            value={newBody}
+          />
           <button
             onClick={() => {
               setIsOpenComment(false);
-              handleCommentUpdate();
+              if (newBody.trim() === '') {
+                setIsOpenError(true);
+              } else {
+                setIsOpenError(false);
+                handleUdpateComment(id);
+              }
             }}>
             Изменить
           </button>
