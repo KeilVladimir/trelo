@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Card } from '../Card';
 import { v4 as uuid } from 'uuid';
@@ -15,7 +15,7 @@ const Column: React.FC<ColumnType> = ({
   const [isOpenAddCard, setIsOpenAddCard] = useState<boolean>(true);
   const [isOpenButton, setIsOpenButton] = useState<boolean>(false);
   const [nameCard, setNameCard] = useState<string>('');
-
+  const refColumnName = useRef<HTMLTextAreaElement>(null);
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
   const [isOpenErrorCard, setIsOpenErrorCard] = useState<boolean>(false);
   const columns: ColumnTypes[] = Local.getColumn();
@@ -41,19 +41,25 @@ const Column: React.FC<ColumnType> = ({
     columns.map((column) => {
       if (column.id === idColumn) {
         column.nameColumns = event.target.value;
-        if (event.target.value.trim() === '') {
-          setIsOpenError(true);
-        } else {
-          setIsOpenError(false);
-          Local.setColumn(columns);
-          setCreatedColumn(columns);
-        }
+        setCreatedColumn(columns);
+        Local.setColumn(columns);
       }
     });
   };
   return (
     <BoardStyled>
-      <textarea onChange={handleNameColumn} value={propsForColumn.nameColumns}>
+      <textarea
+        onBlur={(event) => {
+          if (event.target.value === '') {
+            setIsOpenError(true);
+            refColumnName.current?.focus();
+          } else {
+            setIsOpenError(false);
+          }
+        }}
+        ref={refColumnName}
+        onChange={handleNameColumn}
+        value={propsForColumn.nameColumns}>
         {propsForColumn.nameColumns}
       </textarea>
       {isOpenError && <Error>Поле не может быть пустым</Error>}

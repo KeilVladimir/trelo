@@ -24,6 +24,11 @@ export interface Card {
   nameColumns: string;
 }
 
+export interface Test {
+  state?: Card;
+  setState: (state: Card[]) => void;
+}
+
 export interface CardAll extends Card {
   deleteCard: (id: number) => void;
 }
@@ -43,12 +48,11 @@ export interface InfoCard {
 }
 
 export interface InfoCardAll extends InfoCard {
-  open: (state: boolean) => void;
   comments: Comment[];
-  isOpen: boolean;
   nameColumns: string;
   renameCard: (newName: string, id: number) => void;
   addDescription: (newDescription: string, id: number) => void;
   deleteDescription: (id: number) => void;
   addComment: (body: string, cardId: number) => void;
+  saveCard: () => void;
 }

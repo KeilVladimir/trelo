@@ -3,11 +3,9 @@ import styled from 'styled-components';
 import { CardAll, Comment } from '../../types';
 import { Local } from '../../services/localStorage';
 import { ContextCard } from '../Board/Board';
-import { ContextOpenInfo } from '../Board/Board';
 
 const Card: React.FC<CardAll> = ({ id, name, author, deleteCard }) => {
   const dispatchInfo = useContext<(id: number) => void>(ContextCard);
-  const open = useContext<(state: boolean) => void>(ContextOpenInfo);
   const comments: Comment[] = Local.getComment();
   let commentsActual = 0;
   comments.forEach((comment) => comment.cardId === id && commentsActual++);
@@ -22,7 +20,6 @@ const Card: React.FC<CardAll> = ({ id, name, author, deleteCard }) => {
         </button>
         <div
           onClick={() => {
-            open(true);
             dispatchInfo(id);
           }}>
           <p>{name}</p>
