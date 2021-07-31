@@ -1,145 +1,175 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { ColumnTypes, InfoCardAll } from '../../types';
-import { Local } from '../../services/localStorage';
-import { Context } from '../Board/Board';
+import { InfoCardAll } from '../../types';
 import { Comment } from '../Comment';
 import { v4 as uuid } from 'uuid';
+import { Error } from '../../ui/Error';
 
 const PopUpForCard: React.FC<InfoCardAll> = ({
   id,
-  nameColumn,
-  index,
+  nameColumns,
   author,
-  open,
-  isOpen,
-  state,
+  about,
+  name,
+  renameCard,
+  comments,
+  addDescription,
+  deleteDescription,
+  addComment,
+  saveCard,
 }) => {
   const [isOpenDescription, setIsOpenDescription] = useState<boolean>(false);
   const [isOpenName, setIsOpenName] = useState<boolean>(false);
   const refCard = useRef<HTMLElement>(null);
-  const refCommentName = useRef<HTMLInputElement>(null);
-  const refCardName = useRef<HTMLInputElement>(null);
-  const refDescription = useRef<HTMLInputElement>(null);
-  const setCreatedColumn = useContext<(state: ColumnTypes[]) => void>(Context);
-  const columns = Local.getColumn();
-  const cardIndex = state[index].cards.findIndex((item) => item.id === id);
-  const card = columns[index].cards[cardIndex];
-  const handleComment = () => {
-    columns[index].cards.map((card) => {
-      card.id === id
-        ? card.comments.push({
-            body: refCommentName.current?.value,
-            author: author,
-            cardId: id,
-            id: uuid(),
-            index: index,
-          })
-        : card;
-    });
-    setCreatedColumn(columns);
-    Local.setColumn(columns);
-  };
-  const handleName = () => {
-    columns[index].cards.map((card) => {
-      card.id === id ? (card.name = refCardName.current?.value) : card;
-    });
-    setCreatedColumn(columns);
-    Local.setColumn(columns);
-  };
-  const handleDeleteDescripyion = () => {
-    columns[index].cards.map((card) => {
-      card.id === id ? (card.about = 'описание отсутствует') : card;
-    });
-    setCreatedColumn(columns);
-    Local.setColumn(columns);
-  };
-  const handleDescriptionCard = () => {
-    columns[index].cards.map((card) => {
-      card.id === id ? (card.about = refDescription.current?.value) : card;
-    });
-    setCreatedColumn(columns);
-    Local.setColumn(columns);
-  };
+  const [newComment, setNewComment] = useState<string>('');
+  const [newCardName, setNewCardName] = useState<string>(name);
+  const [newDescription, setNewDescription] = useState<string>(about);
+  const [isOpenErrorCards, setIsOpenErrorCard] = useState<boolean>(false);
+  const [isOpenErrorDescription, setIsOpenErrorDescription] =
+    useState<boolean>(false);
+  const [isOpenErrorComment, setIsOpenErrorComment] = useState<boolean>(false);
+
   useEffect(() => {
     refCard.current?.focus();
-  });
+  }, [refCard]);
+
   return (
     <>
-      {isOpen && (
-        <PopUpForCardStyle
-          tabIndex="0"
-          ref={refCard}
-          onKeyDown={(event: React.KeyboardEvent) => {
-            if (event.key === 'Escape') {
-              open(false);
-            }
-          }}>
+      <PopUpForCardStyle
+        tabIndex="0"
+        ref={refCard}
+        onKeyDown={(event: React.KeyboardEvent) => {
+          if (event.key === 'Escape') {
+            saveCard();
+          }
+        }}
+        onClick={() => {
+          saveCard();
+        }}>
+        <div onClick={(event) => event.stopPropagation()}>
           <button
             onClick={() => {
-              open(false);
+              saveCard();
             }}>
             X
           </button>
-          <div>
-            <h4>Информация о карте</h4>
-            {<p>Название карточки : {card.name}</p>}
-            {!isOpenName && (
+          <h4>Информация о карте</h4>
+          {<p>Название карточки : {name}</p>}
+          {!isOpenName && (
+            <button
+              onClick={() => {
+                setIsOpenName(true);
+                setIsOpenErrorCard(false);
+              }}>
+              Изменить название карточки
+            </button>
+          )}
+          {isOpenErrorCards && <Error>Введите не пустое значение</Error>}
+          {isOpenName && (
+            <>
+              <input
+                onChange={(event) => {
+                  setNewCardName(event.target?.value);
+                }}
+                value={newCardName}
+              />
               <button
                 onClick={() => {
-                  setIsOpenName(true);
-                }}>
-                Изменить название карточки
-              </button>
-            )}
-            {isOpenName && (
-              <>
-                <input ref={refCardName || ''} />
-                <button
-                  onClick={() => {
+                  {
                     setIsOpenName(false);
-                    handleName();
-                  }}>
-                  Изменить имя карточки
-                </button>
-              </>
-            )}
-            <p>Название колонки : {nameColumn}</p>
-            <p>Автор карточки : {author}</p>
-            <p>
-              Описание :
-              {card.about === '' ? 'Описание отстуствует' : card.about}
-            </p>
-            {!isOpenDescription && (
+                    if (newCardName.trim() === '') {
+                      setIsOpenErrorCard(true);
+                    } else {
+                      renameCard(newCardName);
+                      setIsOpenErrorCard(false);
+                    }
+                  }
+                }}>
+                Изменить имя карточки
+              </button>
+            </>
+          )}
+          <p>Название колонки : {nameColumns}</p>
+          <p>Автор карточки : {author}</p>
+          <p>Описание : {about}</p>
+          {!isOpenDescription && (
+            <button
+              onClick={() => {
+                setIsOpenDescription(true);
+                setIsOpenErrorDescription(false);
+              }}>
+              Изменить описание
+            </button>
+          )}
+          {isOpenDescription && (
+            <>
+              <input
+                onChange={(event) => {
+                  setNewDescription(event.target?.value);
+                }}
+                type="text"
+                value={
+                  newDescription === 'Описание отсутствует'
+                    ? ''
+                    : newDescription
+                }
+              />
               <button
                 onClick={() => {
-                  setIsOpenDescription(true);
+                  setIsOpenDescription(false);
+                  if (newDescription.trim() === '') {
+                    setIsOpenErrorDescription(true);
+                  } else {
+                    addDescription(newDescription);
+                    setIsOpenErrorDescription(false);
+                  }
                 }}>
-                Изменить описание
+                Добавить описание
               </button>
-            )}
-            {isOpenDescription && (
-              <>
-                <input ref={refDescription || ''} />
-                <button
-                  onClick={() => {
-                    setIsOpenDescription(false);
-                    handleDescriptionCard();
-                  }}>
-                  Добавить описание
-                </button>
-              </>
-            )}
-            <button onClick={handleDeleteDescripyion}> Удалить описание</button>
-            <h4>Коментарии</h4>
-            <input ref={refCommentName} type="text" />
-            <button onClick={handleComment}>Добавить комент</button>
-            {card.comments.map((comment) => (
-              <Comment key={uuid()} {...comment} />
-            ))}
-          </div>
-        </PopUpForCardStyle>
-      )}
+            </>
+          )}
+          {
+            <>
+              <button
+                onClick={() => {
+                  deleteDescription();
+                }}>
+                {' '}
+                Удалить описание
+              </button>
+              <br />
+            </>
+          }
+          {isOpenErrorDescription && <Error>Введите не пустое значение</Error>}
+          <h4>Коментарии</h4>
+          <input
+            onChange={(event) => {
+              setNewComment(event.target?.value);
+            }}
+            type="text"
+            value={newComment}
+          />
+          {
+            <button
+              onClick={() => {
+                if (newComment.trim() === '') {
+                  setIsOpenErrorComment(true);
+                } else {
+                  setIsOpenErrorComment(false);
+                  addComment(newComment, id);
+                  setNewComment('');
+                }
+              }}>
+              Добавить комент
+            </button>
+          }
+          {isOpenErrorComment && <Error>Введите не пустое значение</Error>}
+          {comments.map(
+            (comment) =>
+              comment.cardId === id && <Comment key={uuid()} {...comment} />,
+          )}
+        </div>
+      </PopUpForCardStyle>
     </>
   );
 };
@@ -177,7 +207,6 @@ const PopUpForCardStyle = styled.span`
     background: rgb(235, 236, 240);
     padding-top: 17px;
     padding-left: 30px;
-
     padding-bottom: 10px;
     border: none;
   }
