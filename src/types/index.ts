@@ -24,11 +24,6 @@ export interface Card {
   nameColumns: string;
 }
 
-export interface Test {
-  state?: Card;
-  setState: (state: Card[]) => void;
-}
-
 export interface CardAll extends Card {
   deleteCard: (id: number) => void;
 }
