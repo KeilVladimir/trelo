@@ -4,140 +4,106 @@ import { Column } from '../Column';
 import { PopUpForAuthor } from '../PopUpForAuthor';
 import { PopUpForCard } from '../PopUpForCard';
 import { Local } from '../../services/localStorage';
-import { Card as CardType, ColumnTypes, Comment } from '../../types';
+import { Card as CardType } from '../../types';
 import { v4 as uuid } from 'uuid';
+import { useSelector } from 'react-redux';
+import { getCard, renameCard } from '../../ducks/card';
+import useAppDispatch from '../hooks/useAppDispatch';
+import getColumns from '../../ducks/column/selectors';
+import { addComment, getComments } from '../../ducks/comment';
+import { getAuthor } from '../../ducks/author';
 
-export const Context = React.createContext<(state: ColumnTypes[]) => void>(
-  () => {},
-);
 export const ContextCard = React.createContext<(id: number) => void>(() => {});
-export const ContextOpenInfo = React.createContext<(state: boolean) => void>(
-  () => {},
-);
-export const ContextComment = React.createContext<(state: Comment[]) => void>(
-  () => {},
-);
 
 const Board: React.FC = () => {
-  const columns: ColumnTypes[] = [
-    {
-      nameColumns: 'TODO',
-      id: uuid(),
-    },
-    {
-      nameColumns: 'In Progress',
-      id: uuid(),
-    },
-    {
-      nameColumns: 'Testing',
-      id: uuid(),
-    },
-    {
-      nameColumns: 'Done',
-      id: uuid(),
-    },
-  ];
   const [cards, setCards] = useState<CardType[]>(Local.getCard());
-  const [createdColumn, setCreatedColumn] = useState<ColumnTypes[]>([]);
-  const [isOpenInfo, setIsOpenInfo] = useState<boolean>(false);
-  const [comments, setComments] = useState<Comment[]>(Local.getComment());
-  const [card, setCard] = useState<CardType>();
-
-  useEffect(() => {
-    const stateColumn: ColumnTypes[] = Local.getColumn();
-    if (stateColumn.length === 0) {
-      Local.setColumn(columns);
-      Local.setCard([]);
-      Local.setComment([]);
-      setCreatedColumn(columns);
-    } else {
-      setCreatedColumn(stateColumn);
-    }
-  }, []);
-  const handleCard = (id: number) => {
-    setCard(cards.find((card) => card.id === id));
-  };
-  let newCard: CardType[];
-  const handleNameCard = (newName: string, id: number) => {
-    newCard = cards.map((card) => {
-      card.id === id ? (card.name = newName) : card;
-      return card;
-    });
-    setCards(newCard);
-    Local.setCard(newCard);
-  };
-
-  const handleDescriptionCard = (newDescription: string, id: number) => {
-    newCard = cards.map((card) => {
-      card.id === id ? (card.about = newDescription) : card;
-      return card;
-    });
-    setCards(newCard);
-    Local.setCard(newCard);
-  };
-  const handleDeleteDescription = (id: number) => {
-    newCard = cards.map((card) => {
-      card.id === id ? (card.about = 'Описание отсутствует') : card;
-      return card;
-    });
-    setCards(newCard);
-    Local.setCard(newCard);
-  };
-
-  const handleComment = (body: string, cardId: number) => {
-    const newComments: Comment = {
-      body: body,
-      author: Local.getAuthor(),
-      cardId: cardId,
-      id: uuid(),
-    };
-    setComments((prevState) => [...prevState, newComments]);
-    Local.setComment([...comments, newComments]);
-  };
-
+  const [changeableCard, setChangeableCard] = useState<CardType>();
   const [isOpen, setIsOpen] = useState<boolean>(Local.getAuthor() === '');
+  const dispatch = useAppDispatch();
+  const Cards = useSelector(getCard);
+  const Columns = useSelector(getColumns);
+  const Comments = useSelector(getComments);
+  const author = useSelector(getAuthor);
+  const handleFindCard = (id: number) => {
+    setChangeableCard(Cards.find((card) => card.id === id));
+  };
+
+  const handleNameCard = (newName: string) => {
+    if (changeableCard !== undefined) {
+      setChangeableCard({
+        ...changeableCard,
+        name: newName,
+      });
+    }
+  };
+
+  const handleReplacementDescription = (newDescription: string) => {
+    if (changeableCard !== undefined) {
+      setChangeableCard({
+        ...changeableCard,
+        about: newDescription,
+      });
+    }
+  };
+
+  const handleDeleteDescription = () => {
+    if (changeableCard !== undefined) {
+      setChangeableCard({
+        ...changeableCard,
+        about: 'Описание отсутствует',
+      });
+    }
+  };
+
+  const handleAddComment = (body: string, cardId: number) => {
+    dispatch(
+      addComment({
+        body: body,
+        author: author,
+        cardId: cardId,
+        id: uuid(),
+      }),
+    );
+  };
+
   useEffect(() => {
-    setIsOpen(Local.getAuthor() === '');
+    setIsOpen(Local.getAuthor() === ''); //!!!!!!!!!!!!!!!!!
   }, []);
+
+  const saveCard = () => {
+    if (changeableCard !== undefined) {
+      dispatch(renameCard(changeableCard));
+    }
+    setChangeableCard(undefined);
+  };
+
   return (
-    <Context.Provider value={setCreatedColumn}>
-      <ContextCard.Provider value={handleCard}>
-        <ContextOpenInfo.Provider value={setIsOpenInfo}>
-          <ContextComment.Provider value={setComments}>
-            <>
-              <ColumnsStyle>
-                {createdColumn.map((elem) => (
-                  <Column
-                    key={elem.id}
-                    propsForColumn={elem}
-                    setCreatedColumn={setCreatedColumn}
-                    setCards={setCards}
-                    cards={cards}
-                  />
-                ))}
-              </ColumnsStyle>
-              {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
-              {isOpenInfo && (
-                <PopUpForCard
-                  comments={comments}
-                  id={card?.id ?? 0}
-                  name={card?.name ?? ''}
-                  author={card?.author ?? ''}
-                  about={card?.about ?? ''}
-                  nameColumns={card?.nameColumns ?? ''}
-                  open={setIsOpenInfo}
-                  isOpen={isOpenInfo}
-                  renameCard={handleNameCard}
-                  addDescription={handleDescriptionCard}
-                  deleteDescription={handleDeleteDescription}
-                  addComment={handleComment}
-                />
-              )}
-            </>
-          </ContextComment.Provider>
-        </ContextOpenInfo.Provider>
-      </ContextCard.Provider>
-    </Context.Provider>
+    <ContextCard.Provider value={handleFindCard}>
+      <>
+        <ColumnsStyle>
+          {Columns.map((elem) => (
+            <Column
+              key={elem.id}
+              propsForColumn={elem}
+              setCards={setCards}
+              cards={cards}
+            />
+          ))}
+        </ColumnsStyle>
+        {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
+        {changeableCard !== undefined && (
+          <PopUpForCard
+            comments={Comments}
+            {...changeableCard}
+            renameCard={handleNameCard}
+            addDescription={handleReplacementDescription}
+            deleteDescription={handleDeleteDescription}
+            addComment={handleAddComment}
+            saveCard={saveCard}
+          />
+        )}
+      </>
+    </ContextCard.Provider>
   );
 };
 

@@ -1,42 +1,27 @@
-import Reacts, { useContext, useState } from 'react';
+import Reacts, { useState } from 'react';
 import styled from 'styled-components';
 import { Comment as CommentType } from '../../types';
-import React from 'react';
-import { Local } from '../../services/localStorage';
-import { ContextComment } from '../Board/Board';
 import { Error } from '../../ui/Error';
+import { useSelector } from 'react-redux';
+import { getAuthor } from '../../ducks/author';
+import useAppDispatch from '../hooks/useAppDispatch';
+import { deleteComment, renameComment } from '../../ducks/comment';
 
-const Comment: Reacts.FC<CommentType> = ({ body, author, id }) => {
-  const comments: CommentType[] = Local.getComment();
-  const setComments =
-    useContext<(state: CommentType[]) => void>(ContextComment);
+const Comment: Reacts.FC<CommentType> = ({ body, id }) => {
   const [newBody, setNewBody] = useState<string>(body);
   const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
-
-  let newComments: CommentType[];
-  const handleDeleteComment = (id: number) => {
-    newComments = comments.filter((comment) => comment.id !== id);
-    setComments(newComments);
-    Local.setComment(newComments);
-  };
-  const handleUdpateComment = (id: number) => {
-    newComments = comments.map((comment) => {
-      comment.id === id ? (comment.body = newBody) : comment;
-      return comment;
-    });
-    setComments(newComments);
-    Local.setComment(newComments);
-  };
+  const Author = useSelector(getAuthor);
+  const dispatch = useAppDispatch();
   return (
     <CommentStyle>
       <ButtonDelete
         onClick={() => {
-          handleDeleteComment(id);
+          dispatch(deleteComment(id));
         }}>
         Х
       </ButtonDelete>
-      <p>Автор комментария : {author}</p>
+      <p>Автор комментария : {Author}</p>
       {!isOpenComment && (
         <>
           <p>{body}</p>
@@ -67,7 +52,7 @@ const Comment: Reacts.FC<CommentType> = ({ body, author, id }) => {
                 setIsOpenError(true);
               } else {
                 setIsOpenError(false);
-                handleUdpateComment(id);
+                dispatch(renameComment({ id: id, body: newBody }));
               }
             }}>
             Изменить

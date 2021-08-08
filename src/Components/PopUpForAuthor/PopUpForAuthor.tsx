@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Local } from '../../services/localStorage';
 import { Error } from '../../ui/Error';
+import useAppDispatch from '../hooks/useAppDispatch';
+import { authorAction } from '../../ducks/author';
 
 const PopUpForAuthor: React.FC<{
   setIsOpen: (isOpen: boolean) => void;
 }> = (props) => {
+  const dispatch = useAppDispatch();
   const [name, setName] = useState<string>('');
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
+
   return (
     <StyledPopUp>
       <div>
@@ -25,8 +28,8 @@ const PopUpForAuthor: React.FC<{
               setIsOpenError(true);
             } else {
               setIsOpenError(false);
-              Local.setAuthor(name);
               props.setIsOpen(false);
+              dispatch(authorAction(name));
             }
           }}>
           Ввести имя

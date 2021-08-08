@@ -1,70 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Card } from '../Card';
 import { v4 as uuid } from 'uuid';
-import { Local } from '../../services/localStorage';
-import { Column as ColumnType, ColumnTypes } from '../../types';
+import { Column as ColumnType } from '../../types';
 import { Error } from '../../ui/Error';
+import { useSelector } from 'react-redux';
+import { columnAction } from '../../ducks/column';
+import { getAuthor } from '../../ducks/author';
+import useAppDispatch from '../hooks/useAppDispatch';
+import { addCard, getCard } from '../../ducks/card';
 
-const Column: React.FC<ColumnType> = ({
-  propsForColumn,
-  cards,
-  setCards,
-  setCreatedColumn,
-}) => {
+const Column: React.FC<ColumnType> = ({ propsForColumn }) => {
   const [isOpenAddCard, setIsOpenAddCard] = useState<boolean>(true);
   const [isOpenButton, setIsOpenButton] = useState<boolean>(false);
   const [nameCard, setNameCard] = useState<string>('');
-
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
   const [isOpenErrorCard, setIsOpenErrorCard] = useState<boolean>(false);
-  const columns: ColumnTypes[] = Local.getColumn();
+  const refColumnName = useRef<HTMLTextAreaElement>(null);
   const idColumn = propsForColumn.id;
-  const handleCard = () => {
-    cards.push({
-      id: uuid(),
-      about: 'Описание отсутствует',
-      name: nameCard,
-      author: Local.getAuthor(),
-      idColumn: idColumn,
-      nameColumns: propsForColumn.nameColumns,
-    });
-    Local.setCard(cards);
-    setCards(cards);
+  const author = useSelector(getAuthor);
+  const newCards = useSelector(getCard);
+  const dispatch = useAppDispatch();
+
+  const handleAddCard = () => {
+    dispatch(
+      addCard({
+        id: uuid(),
+        about: 'Описание отсутствует',
+        name: nameCard,
+        author: author,
+        idColumn: idColumn,
+        nameColumns: propsForColumn.nameColumns,
+      }),
+    );
   };
-  const handleDeleteCard = (id: number) => {
-    const newCards = cards.filter((card) => card.id !== id);
-    Local.setCard(newCards);
-    setCards(newCards);
-  };
-  const handleNameColumn = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    columns.map((column) => {
-      if (column.id === idColumn) {
-        column.nameColumns = event.target.value;
-        if (event.target.value.trim() === '') {
-          setIsOpenError(true);
-        } else {
-          setIsOpenError(false);
-          Local.setColumn(columns);
-          setCreatedColumn(columns);
-        }
-      }
-    });
-  };
+
   return (
     <BoardStyled>
-      <textarea onChange={handleNameColumn} value={propsForColumn.nameColumns}>
-        {propsForColumn.nameColumns}
-      </textarea>
+      <textarea
+        onBlur={(event) => {
+          if (event.target.value === '') {
+            setIsOpenError(true);
+            refColumnName.current?.focus();
+          } else {
+            setIsOpenError(false);
+          }
+        }}
+        ref={refColumnName}
+        onChange={(event) =>
+          dispatch(
+            columnAction({ id: idColumn, nameColumns: event.target.value }),
+          )
+        }
+        defaultValue={propsForColumn.nameColumns}
+      />
+
       {isOpenError && <Error>Поле не может быть пустым</Error>}
-      {cards.map(
+      {newCards.map(
         (elem) =>
           idColumn === elem.idColumn && (
             <Card
               key={elem.id}
               {...elem}
               nameColumns={propsForColumn.nameColumns}
-              deleteCard={handleDeleteCard}
             />
           ),
       )}
@@ -95,7 +93,7 @@ const Column: React.FC<ColumnType> = ({
                 setIsOpenErrorCard(false);
                 setIsOpenButton(false);
                 setIsOpenAddCard(true);
-                handleCard();
+                handleAddCard();
               }
             }}>
             Добавить карточку
