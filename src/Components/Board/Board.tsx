@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Column } from '../Column';
 import { PopUpForAuthor } from '../PopUpForAuthor';
 import { PopUpForCard } from '../PopUpForCard';
-import { Local } from '../../services/localStorage';
 import { Card as CardType } from '../../types';
 import { v4 as uuid } from 'uuid';
 import { useSelector } from 'react-redux';
@@ -16,16 +15,16 @@ import { getAuthor } from '../../ducks/author';
 export const ContextCard = React.createContext<(id: number) => void>(() => {});
 
 const Board: React.FC = () => {
-  const [cards, setCards] = useState<CardType[]>(Local.getCard());
   const [changeableCard, setChangeableCard] = useState<CardType>();
-  const [isOpen, setIsOpen] = useState<boolean>(Local.getAuthor() === '');
   const dispatch = useAppDispatch();
-  const Cards = useSelector(getCard);
-  const Columns = useSelector(getColumns);
-  const Comments = useSelector(getComments);
+  const cards = useSelector(getCard);
+  const columns = useSelector(getColumns);
+  const comments = useSelector(getComments);
   const author = useSelector(getAuthor);
+  const [isOpen, setIsOpen] = useState<boolean>(author === '');
+
   const handleFindCard = (id: number) => {
-    setChangeableCard(Cards.find((card) => card.id === id));
+    setChangeableCard(cards.find((card) => card.id === id));
   };
 
   const handleNameCard = (newName: string) => {
@@ -67,8 +66,8 @@ const Board: React.FC = () => {
   };
 
   useEffect(() => {
-    setIsOpen(Local.getAuthor() === ''); //!!!!!!!!!!!!!!!!!
-  }, []);
+    setIsOpen(author === '');
+  }, [author]);
 
   const saveCard = () => {
     if (changeableCard !== undefined) {
@@ -81,19 +80,14 @@ const Board: React.FC = () => {
     <ContextCard.Provider value={handleFindCard}>
       <>
         <ColumnsStyle>
-          {Columns.map((elem) => (
-            <Column
-              key={elem.id}
-              propsForColumn={elem}
-              setCards={setCards}
-              cards={cards}
-            />
+          {columns.map((elem) => (
+            <Column key={elem.id} propsForColumn={elem} cards={cards} />
           ))}
         </ColumnsStyle>
         {isOpen && <PopUpForAuthor setIsOpen={setIsOpen} />}
         {changeableCard !== undefined && (
           <PopUpForCard
-            comments={Comments}
+            comments={comments}
             {...changeableCard}
             renameCard={handleNameCard}
             addDescription={handleReplacementDescription}

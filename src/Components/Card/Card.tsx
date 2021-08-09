@@ -13,6 +13,7 @@ const Card: React.FC<CardType> = ({ id, name, author }) => {
   const dispatch = useAppDispatch();
   let commentsActual = 0;
   comments.forEach((comment) => comment.cardId === id && commentsActual++);
+
   return (
     <>
       <CardStyle>

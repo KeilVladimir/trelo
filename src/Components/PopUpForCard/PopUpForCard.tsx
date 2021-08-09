@@ -28,6 +28,7 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
   const [isOpenErrorDescription, setIsOpenErrorDescription] =
     useState<boolean>(false);
   const [isOpenErrorComment, setIsOpenErrorComment] = useState<boolean>(false);
+
   useEffect(() => {
     refCard.current?.focus();
   }, [refCard]);
@@ -180,15 +181,19 @@ const PopUpForCardStyle = styled.span`
   top: 0;
   left: 0;
   display: block;
+
   p {
     padding-left: 10px;
   }
+
   button {
     margin-left: 10px;
   }
+
   h4 {
     margin-left: 45%;
   }
+
   div {
     background: white;
     min-height: 400px;
@@ -196,6 +201,7 @@ const PopUpForCardStyle = styled.span`
     width: 80%;
     padding-top: 10px;
   }
+
   textarea {
     font-size: 16px;
     background: rgb(235, 236, 240);

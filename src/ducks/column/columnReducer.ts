@@ -2,6 +2,7 @@ import { createReducer, PayloadAction } from '@reduxjs/toolkit';
 import { v4 as uuid } from 'uuid';
 import { ColumnTypes } from '../../types';
 import { columnAction } from './actions';
+
 const columns = [
   {
     nameColumns: 'TODO',
@@ -21,7 +22,7 @@ const columns = [
   },
 ] as ColumnTypes[];
 
-export const columnReducer = createReducer<ColumnTypes[]>(columns, {
+const columnReducer = createReducer<ColumnTypes[]>(columns, {
   [columnAction.type]: (state, action: PayloadAction<ColumnTypes>) => {
     console.log(action.payload);
     state.map((column) =>
@@ -31,3 +32,5 @@ export const columnReducer = createReducer<ColumnTypes[]>(columns, {
     );
   },
 });
+
+export default columnReducer;

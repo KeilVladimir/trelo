@@ -11,8 +11,9 @@ const Comment: Reacts.FC<CommentType> = ({ body, id }) => {
   const [newBody, setNewBody] = useState<string>(body);
   const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
   const [isOpenError, setIsOpenError] = useState<boolean>(false);
-  const Author = useSelector(getAuthor);
+  const author = useSelector(getAuthor);
   const dispatch = useAppDispatch();
+
   return (
     <CommentStyle>
       <ButtonDelete
@@ -21,7 +22,7 @@ const Comment: Reacts.FC<CommentType> = ({ body, id }) => {
         }}>
         Х
       </ButtonDelete>
-      <p>Автор комментария : {Author}</p>
+      <p>Автор комментария : {author}</p>
       {!isOpenComment && (
         <>
           <p>{body}</p>

@@ -19,7 +19,7 @@ const Column: React.FC<ColumnType> = ({ propsForColumn }) => {
   const refColumnName = useRef<HTMLTextAreaElement>(null);
   const idColumn = propsForColumn.id;
   const author = useSelector(getAuthor);
-  const newCards = useSelector(getCard);
+  const cards = useSelector(getCard);
   const dispatch = useAppDispatch();
 
   const handleAddCard = () => {
@@ -56,7 +56,7 @@ const Column: React.FC<ColumnType> = ({ propsForColumn }) => {
       />
 
       {isOpenError && <Error>Поле не может быть пустым</Error>}
-      {newCards.map(
+      {cards.map(
         (elem) =>
           idColumn === elem.idColumn && (
             <Card

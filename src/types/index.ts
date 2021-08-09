@@ -9,7 +9,6 @@ interface PropsForColumn {
 }
 
 export interface Column {
-  setCards: (state: Card[]) => void;
   cards: Card[];
   propsForColumn: PropsForColumn;
 }
