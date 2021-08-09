@@ -1,7 +1,3 @@
 import { RootState } from '../index';
 
-function getAuthor(store: RootState) {
-  return store.author;
-}
-
-export { getAuthor };
+export const getAuthor = (state: RootState) => state.author;

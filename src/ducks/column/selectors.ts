@@ -1,7 +1,3 @@
 import { RootState } from '../index';
 
-function getColumns(store: RootState) {
-  return store.columns;
-}
-
-export default getColumns;
+export const getColumn = (state: RootState) => state.columns;

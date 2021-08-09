@@ -1,6 +1,6 @@
 import { columnAction } from './actions';
 import columnReducer from './columnReducer';
-import getColumns from './selectors';
+import { getColumn } from './selectors';
 
 export default columnReducer;
-export { columnAction, getColumns };
+export { columnAction, getColumn };

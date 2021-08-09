@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { useSelector } from 'react-redux';
 import { getCard, renameCard } from '../../ducks/card';
 import useAppDispatch from '../hooks/useAppDispatch';
-import getColumns from '../../ducks/column/selectors';
+import { getColumn } from '../../ducks/column';
 import { addComment, getComments } from '../../ducks/comment';
 import { getAuthor } from '../../ducks/author';
 
@@ -18,7 +18,7 @@ const Board: React.FC = () => {
   const [changeableCard, setChangeableCard] = useState<CardType>();
   const dispatch = useAppDispatch();
   const cards = useSelector(getCard);
-  const columns = useSelector(getColumns);
+  const columns = useSelector(getColumn);
   const comments = useSelector(getComments);
   const author = useSelector(getAuthor);
   const [isOpen, setIsOpen] = useState<boolean>(author === '');
