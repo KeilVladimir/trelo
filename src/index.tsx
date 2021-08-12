@@ -8,11 +8,11 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { createGlobalStyle } from 'styled-components';
 
 const Global = createGlobalStyle`
-body{
-  margin: 0;
-  padding:0;
-  background-color: #0079bf;
-}
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #0079bf;
+  }
 `;
 
 ReactDOM.render(

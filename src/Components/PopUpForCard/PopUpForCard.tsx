@@ -1,38 +1,39 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { InfoCardAll } from '../../types';
+import { InfoCardAll, RefactorCard } from '../../types';
 import { Comment } from '../Comment';
 import { v4 as uuid } from 'uuid';
 import { Error } from '../../ui/Error';
+import { Form, Field } from 'react-final-form';
 
 const PopUpForCard: React.FC<InfoCardAll> = ({
   id,
-  nameColumns,
-  author,
   about,
   name,
-  renameCard,
   comments,
-  addDescription,
-  deleteDescription,
-  addComment,
   saveCard,
+  author,
+  nameColumns,
+  setChangeableCard,
+  addComment,
 }) => {
-  const [isOpenDescription, setIsOpenDescription] = useState<boolean>(false);
-  const [isOpenName, setIsOpenName] = useState<boolean>(false);
   const refCard = useRef<HTMLElement>(null);
   const [newComment, setNewComment] = useState<string>('');
-  const [newCardName, setNewCardName] = useState<string>(name);
-  const [newDescription, setNewDescription] = useState<string>(about);
-  const [isOpenErrorCards, setIsOpenErrorCard] = useState<boolean>(false);
-  const [isOpenErrorDescription, setIsOpenErrorDescription] =
-    useState<boolean>(false);
   const [isOpenErrorComment, setIsOpenErrorComment] = useState<boolean>(false);
 
   useEffect(() => {
     refCard.current?.focus();
   }, [refCard]);
 
+  const initialState: RefactorCard = {
+    id: id,
+    about: about,
+    name: name,
+  };
+  const onSubmit = (values) => {
+    saveCard(values);
+  };
+  const required = (value) => (value ? '' : 'Поле не может быть пустым');
   return (
     <>
       <PopUpForCardStyle
@@ -40,107 +41,78 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
         ref={refCard}
         onKeyDown={(event: React.KeyboardEvent) => {
           if (event.key === 'Escape') {
-            saveCard();
+            setChangeableCard(undefined);
           }
         }}
         onClick={() => {
-          saveCard();
+          setChangeableCard(undefined);
         }}>
-        <div onClick={(event) => event.stopPropagation()}>
+        <section onClick={(event) => event.stopPropagation()}>
           <button
             onClick={() => {
-              saveCard();
+              setChangeableCard(undefined);
             }}>
             X
           </button>
           <h4>Информация о карте</h4>
-          {<p>Название карточки : {name}</p>}
-          {!isOpenName && (
-            <button
-              onClick={() => {
-                setIsOpenName(true);
-                setIsOpenErrorCard(false);
-              }}>
-              Изменить название карточки
-            </button>
-          )}
-          {isOpenErrorCards && <Error>Введите не пустое значение</Error>}
-          {isOpenName && (
-            <>
-              <input
-                onChange={(event) => {
-                  setNewCardName(event.target?.value);
-                }}
-                value={newCardName}
-              />
-              <button
-                onClick={() => {
-                  {
-                    setIsOpenName(false);
-                    if (newCardName.trim() === '') {
-                      setIsOpenErrorCard(true);
-                    } else {
-                      renameCard(newCardName);
-                      setIsOpenErrorCard(false);
-                    }
-                  }
-                }}>
-                Изменить имя карточки
-              </button>
-            </>
-          )}
           <p>Название колонки : {nameColumns}</p>
           <p>Автор карточки : {author}</p>
-          <p>Описание : {about}</p>
-          {!isOpenDescription && (
-            <button
-              onClick={() => {
-                setIsOpenDescription(true);
-                setIsOpenErrorDescription(false);
-              }}>
-              Изменить описание
-            </button>
-          )}
-          {isOpenDescription && (
-            <>
-              <input
-                onChange={(event) => {
-                  setNewDescription(event.target?.value);
-                }}
-                type="text"
-                value={
-                  newDescription === 'Описание отсутствует'
-                    ? ''
-                    : newDescription
-                }
-              />
-              <button
-                onClick={() => {
-                  setIsOpenDescription(false);
-                  if (newDescription.trim() === '') {
-                    setIsOpenErrorDescription(true);
-                  } else {
-                    addDescription(newDescription);
-                    setIsOpenErrorDescription(false);
-                  }
-                }}>
-                Добавить описание
-              </button>
-            </>
-          )}
-          {
-            <>
-              <button
-                onClick={() => {
-                  deleteDescription();
-                }}>
-                {' '}
-                Удалить описание
-              </button>
-              <br />
-            </>
-          }
-          {isOpenErrorDescription && <Error>Введите не пустое значение</Error>}
+          <Form onSubmit={onSubmit} initialValues={initialState}>
+            {({ handleSubmit, values }) => (
+              <form onSubmit={handleSubmit}>
+                <FieldBox>
+                  <Field
+                    name="name"
+                    component="input"
+                    type="text"
+                    validate={required}
+                    value={initialState.name}>
+                    {({ input, meta }) => (
+                      <span>
+                        <label>Имя карты</label>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="Напишите имя"
+                        />
+                        {meta.error && meta.touched && <p>{meta.error}</p>}
+                      </span>
+                    )}
+                  </Field>
+                </FieldBox>{' '}
+                <br />
+                <FieldBox>
+                  <Field
+                    name="about"
+                    component="input"
+                    type="text"
+                    validate={required}
+                    value={initialState.about}>
+                    {({ input, meta }) => (
+                      <span>
+                        <label>Описание карты</label>
+                        <input
+                          {...input}
+                          type="text"
+                          placeholder="Напишите описание"
+                        />
+                        <button
+                          onClick={() => {
+                            values.about = '';
+                          }}>
+                          {' '}
+                          Удалить описание
+                        </button>
+                        {meta.error && meta.touched && <p>{meta.error}</p>}
+                      </span>
+                    )}
+                  </Field>
+                </FieldBox>{' '}
+                <br />
+                <button type="submit">Сохранить изменения</button>
+              </form>
+            )}
+          </Form>
           <h4>Коментарии</h4>
           <input
             onChange={(event) => {
@@ -156,8 +128,8 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
                   setIsOpenErrorComment(true);
                 } else {
                   setIsOpenErrorComment(false);
-                  addComment(newComment, id);
                   setNewComment('');
+                  addComment(newComment, id);
                 }
               }}>
               Добавить комент
@@ -168,7 +140,7 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
             (comment) =>
               comment.cardId === id && <Comment key={uuid()} {...comment} />,
           )}
-        </div>
+        </section>
       </PopUpForCardStyle>
     </>
   );
@@ -201,7 +173,7 @@ const PopUpForCardStyle = styled.span`
     margin-left: 45%;
   }
 
-  div {
+  section {
     background: white;
     min-height: 400px;
     margin: 0 auto;
@@ -218,9 +190,29 @@ const PopUpForCardStyle = styled.span`
     border: none;
     border-radius: 5%;
   }
+
   input {
     margin-left: 10px;
     border-radius: 5%;
+  }
+
+  span {
+    margin-left: 10px;
+    display: block;
+  }
+`;
+const FieldBox = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  span {
+    display: flex;
+    align-items: baseline;
+  }
+
+  p {
+    display: block;
+    color: #6d0608;
   }
 `;
 export default PopUpForCard;

@@ -39,9 +39,12 @@ export interface InfoCard {
 export interface InfoCardAll extends InfoCard {
   comments: Comment[];
   nameColumns: string;
-  renameCard: (newName: string) => void;
-  addDescription: (newDescription: string) => void;
-  deleteDescription: () => void;
+  saveCard: (newCard: RefactorCard) => void;
+  setChangeableCard: (card?: Card) => void;
   addComment: (body: string, cardId: number) => void;
-  saveCard: () => void;
+}
+export interface RefactorCard {
+  name: string;
+  id: number;
+  about: string;
 }

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Column } from '../Column';
 import { PopUpForAuthor } from '../PopUpForAuthor';
 import { PopUpForCard } from '../PopUpForCard';
-import { Card as CardType } from '../../types';
+import { Card as CardType, RefactorCard } from '../../types';
 import { v4 as uuid } from 'uuid';
 import { useSelector } from 'react-redux';
 import { getCard, renameCard } from '../../ducks/card';
@@ -27,33 +27,6 @@ const Board: React.FC = () => {
     setChangeableCard(cards.find((card) => card.id === id));
   };
 
-  const handleNameCard = (newName: string) => {
-    if (changeableCard !== undefined) {
-      setChangeableCard({
-        ...changeableCard,
-        name: newName,
-      });
-    }
-  };
-
-  const handleReplacementDescription = (newDescription: string) => {
-    if (changeableCard !== undefined) {
-      setChangeableCard({
-        ...changeableCard,
-        about: newDescription,
-      });
-    }
-  };
-
-  const handleDeleteDescription = () => {
-    if (changeableCard !== undefined) {
-      setChangeableCard({
-        ...changeableCard,
-        about: 'Описание отсутствует',
-      });
-    }
-  };
-
   const handleAddComment = (body: string, cardId: number) => {
     dispatch(
       addComment({
@@ -69,11 +42,10 @@ const Board: React.FC = () => {
     setIsOpen(author === '');
   }, [author]);
 
-  const saveCard = () => {
+  const saveCard = (newCard: RefactorCard) => {
     if (changeableCard !== undefined) {
-      dispatch(renameCard(changeableCard));
+      dispatch(renameCard(newCard));
     }
-    setChangeableCard(undefined);
   };
 
   return (
@@ -92,11 +64,9 @@ const Board: React.FC = () => {
           <PopUpForCard
             comments={comments}
             {...changeableCard}
-            renameCard={handleNameCard}
-            addDescription={handleReplacementDescription}
-            deleteDescription={handleDeleteDescription}
-            addComment={handleAddComment}
             saveCard={saveCard}
+            setChangeableCard={setChangeableCard}
+            addComment={handleAddComment}
           />
         )}
       </>
@@ -118,6 +88,7 @@ const Head = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
   h3 {
     font-size: 25px;
     margin: 0;

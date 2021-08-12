@@ -1,3 +1,6 @@
 import { RootState } from '../index';
+import { createSelector } from 'reselect';
 
-export const getComments = (state: RootState) => state.comment;
+export const getComment = (state: RootState) => state.comment;
+
+export const getComments = createSelector(getComment, (state) => state);

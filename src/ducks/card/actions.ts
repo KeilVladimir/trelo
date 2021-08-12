@@ -1,7 +1,7 @@
 import { createAction } from '@reduxjs/toolkit';
-import { Card } from '../../types';
+import { Card, RefactorCard } from '../../types';
 
-const renameCard = createAction<Card, 'renameCard'>('renameCard');
+const renameCard = createAction<RefactorCard, 'renameCard'>('renameCard');
 const addCard = createAction<Card, 'addCard'>('addCard');
 const deleteCard = createAction<number, 'deleteCard'>('deleteCard');
 

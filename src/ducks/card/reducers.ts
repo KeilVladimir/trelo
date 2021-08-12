@@ -1,11 +1,17 @@
 import { createReducer, PayloadAction } from '@reduxjs/toolkit';
-import { Card } from '../../types';
+import { Card, RefactorCard } from '../../types';
 import * as cardActions from './actions';
 
 export const cardReducer = createReducer<Card[]>([], {
-  [cardActions.renameCard.type]: (state, action: PayloadAction<Card>) => {
-    return state.map((card) => {
-      card.id === action.payload.id ? (card = action.payload) : card;
+  [cardActions.renameCard.type]: (
+    state,
+    action: PayloadAction<RefactorCard>,
+  ) => {
+    state.map((card) => {
+      if (card.id === action.payload.id) {
+        card.name = action.payload.name;
+        card.about = action.payload.about;
+      }
       return card;
     });
   },
