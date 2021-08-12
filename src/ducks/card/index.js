@@ -1,6 +1,3 @@
-import { addCard, deleteCard, renameCard } from './actions';
-import cardReducer from './reducers';
-import { getCard } from './selectors';
-
-export default cardReducer;
-export { getCard, addCard, deleteCard, renameCard };
+export { addCard, deleteCard, renameCard } from './actions';
+export { getCard } from './selectors';
+export { cardReducer } from './reducers';

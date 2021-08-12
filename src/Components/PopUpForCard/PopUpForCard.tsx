@@ -180,7 +180,9 @@ const PopUpForCardStyle = styled.span`
   background: rgba(0, 0, 0, 0.3);
   top: 0;
   left: 0;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   p {
     padding-left: 10px;
@@ -188,6 +190,11 @@ const PopUpForCardStyle = styled.span`
 
   button {
     margin-left: 10px;
+    background-color: #0067a3;
+    color: white;
+    border: none;
+    border-radius: 5%;
+    padding: 5px;
   }
 
   h4 {
@@ -209,6 +216,11 @@ const PopUpForCardStyle = styled.span`
     padding-left: 30px;
     padding-bottom: 10px;
     border: none;
+    border-radius: 5%;
+  }
+  input {
+    margin-left: 10px;
+    border-radius: 5%;
   }
 `;
 export default PopUpForCard;

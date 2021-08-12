@@ -22,9 +22,8 @@ const columns = [
   },
 ] as ColumnTypes[];
 
-const columnReducer = createReducer<ColumnTypes[]>(columns, {
+export const columnReducer = createReducer<ColumnTypes[]>(columns, {
   [columnAction.type]: (state, action: PayloadAction<ColumnTypes>) => {
-    console.log(action.payload);
     state.map((column) =>
       column.id === action.payload.id
         ? (column.nameColumns = action.payload.nameColumns)
@@ -32,5 +31,3 @@ const columnReducer = createReducer<ColumnTypes[]>(columns, {
     );
   },
 });
-
-export default columnReducer;

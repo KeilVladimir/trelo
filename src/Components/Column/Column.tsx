@@ -139,6 +139,9 @@ const CardForm = styled.div`
   }
 `;
 const BoardStyled = styled.div<string>`
+  border-radius: 5%;
+  margin-right: 10px;
+
   textarea {
     background: rgb(235, 236, 240);
     padding-top: 17px;

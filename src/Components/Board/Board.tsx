@@ -79,6 +79,9 @@ const Board: React.FC = () => {
   return (
     <ContextCard.Provider value={handleFindCard}>
       <>
+        <Head>
+          <h3>Trello</h3>
+        </Head>
         <ColumnsStyle>
           {columns.map((elem) => (
             <Column key={elem.id} propsForColumn={elem} cards={cards} />
@@ -105,5 +108,19 @@ const ColumnsStyle = styled.div`
   display: flex;
   align-items: baseline;
   justify-content: space-around;
+`;
+
+const Head = styled.div`
+  width: 100%;
+  height: 50px;
+  background-color: #0067a3;
+  color: #7fb3d1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  h3 {
+    font-size: 25px;
+    margin: 0;
+  }
 `;
 export default Board;
