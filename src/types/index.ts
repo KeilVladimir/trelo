@@ -9,8 +9,6 @@ interface PropsForColumn {
 }
 
 export interface Column {
-  setCreatedColumn: (state: ColumnTypes[]) => void;
-  setCards: (state: Card[]) => void;
   cards: Card[];
   propsForColumn: PropsForColumn;
 }
@@ -22,10 +20,6 @@ export interface Card {
   idColumn: number;
   author: string;
   nameColumns: string;
-}
-
-export interface CardAll extends Card {
-  deleteCard: (id: number) => void;
 }
 
 export interface Comment {
@@ -43,12 +37,11 @@ export interface InfoCard {
 }
 
 export interface InfoCardAll extends InfoCard {
-  open: (state: boolean) => void;
   comments: Comment[];
-  isOpen: boolean;
   nameColumns: string;
-  renameCard: (newName: string, id: number) => void;
-  addDescription: (newDescription: string, id: number) => void;
-  deleteDescription: (id: number) => void;
+  renameCard: (newName: string) => void;
+  addDescription: (newDescription: string) => void;
+  deleteDescription: () => void;
   addComment: (body: string, cardId: number) => void;
+  saveCard: () => void;
 }

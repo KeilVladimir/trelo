@@ -1,28 +1,30 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { CardAll, Comment } from '../../types';
-import { Local } from '../../services/localStorage';
+import { Card as CardType, Comment } from '../../types';
 import { ContextCard } from '../Board/Board';
-import { ContextOpenInfo } from '../Board/Board';
+import { useSelector } from 'react-redux';
+import { getComments } from '../../ducks/comment';
+import useAppDispatch from '../hooks/useAppDispatch';
+import { deleteCard } from '../../ducks/card';
 
-const Card: React.FC<CardAll> = ({ id, name, author, deleteCard }) => {
+const Card: React.FC<CardType> = ({ id, name, author }) => {
   const dispatchInfo = useContext<(id: number) => void>(ContextCard);
-  const open = useContext<(state: boolean) => void>(ContextOpenInfo);
-  const comments: Comment[] = Local.getComment();
+  const comments: Comment[] = useSelector(getComments);
+  const dispatch = useAppDispatch();
   let commentsActual = 0;
   comments.forEach((comment) => comment.cardId === id && commentsActual++);
+
   return (
     <>
       <CardStyle>
         <button
           onClick={() => {
-            deleteCard(id);
+            dispatch(deleteCard(id));
           }}>
           Х
         </button>
         <div
           onClick={() => {
-            open(true);
             dispatchInfo(id);
           }}>
           <p>{name}</p>
