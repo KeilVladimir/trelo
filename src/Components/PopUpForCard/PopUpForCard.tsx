@@ -31,7 +31,9 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
     name: name,
   };
   const onSubmit = (values) => {
-    saveCard(values);
+    if (values.about.trim() && values.name.trim() !== '') {
+      saveCard(values);
+    }
   };
   const required = (value) => (value ? '' : 'Поле не может быть пустым');
   return (
