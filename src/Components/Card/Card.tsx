@@ -42,7 +42,7 @@ const CardStyle = styled.div`
   margin-left: 35px;
   height: auto;
   border-radius: 13px;
-
+  padding: 5px;
   p {
     padding-top: 5px;
     padding-left: 5px;

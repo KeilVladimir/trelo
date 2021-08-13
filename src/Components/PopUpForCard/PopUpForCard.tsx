@@ -57,6 +57,7 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
           <h4>Информация о карте</h4>
           <p>Название колонки : {nameColumns}</p>
           <p>Автор карточки : {author}</p>
+
           <Form onSubmit={onSubmit} initialValues={initialState}>
             {({ handleSubmit, values }) => (
               <form onSubmit={handleSubmit}>
@@ -107,12 +108,13 @@ const PopUpForCard: React.FC<InfoCardAll> = ({
                       </span>
                     )}
                   </Field>
-                </FieldBox>{' '}
+                </FieldBox>
                 <br />
                 <button type="submit">Сохранить изменения</button>
               </form>
             )}
           </Form>
+
           <h4>Коментарии</h4>
           <input
             onChange={(event) => {
@@ -169,6 +171,10 @@ const PopUpForCardStyle = styled.span`
     padding: 5px;
   }
 
+  button:hover {
+    background-color: #0a3391;
+  }
+
   h4 {
     margin-left: 45%;
   }
@@ -212,7 +218,7 @@ const FieldBox = styled.div`
 
   p {
     display: block;
-    color: #6d0608;
+    color: #b30100;
   }
 `;
 export default PopUpForCard;

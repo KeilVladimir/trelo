@@ -70,11 +70,10 @@ const CommentStyle = styled.span`
   max-width: 350px;
   display: block;
   border: 1px ridge black;
-  margin-bottom: 10px;
   height: auto;
-
+  padding: 5px;
   p {
-    padding-left: 30px;
+    padding-left: 12px;
   }
 
   button {

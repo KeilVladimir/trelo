@@ -1,3 +1,6 @@
 import { RootState } from '../index';
+import { createSelector } from 'reselect';
 
-export const getCard = (state: RootState) => state.card;
+export const getStateForCards = (state: RootState) => state.card;
+
+export const getCard = createSelector(getStateForCards, (state) => state);
